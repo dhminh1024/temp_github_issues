@@ -1,17 +1,17 @@
 import React from "react";
 
-const IssueList = ({ issues }) => {
+const IssueList = ({ issues, showDetail }) => {
   return (
     <div>
       {issues.map((issue) => (
-        <IssueDetail key={issue.id} issue={issue} />
+        <IssueDetail key={issue.id} issue={issue} showDetail={showDetail} />
       ))}
     </div>
   );
 };
 
-const IssueDetail = ({ issue }) => {
-  return <h4>{issue.title}</h4>;
+const IssueDetail = ({ issue, showDetail }) => {
+  return <h4 onClick={() => showDetail(issue)}>{issue.title}</h4>;
 };
 
 export default IssueList;

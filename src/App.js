@@ -14,7 +14,10 @@ function App() {
   const [owner, setOwner] = useState("");
   const [repo, setRepo] = useState("");
   const [pageNum, setPageNum] = useState(1);
+  const [totalPageNum, setTotalPageNum] = useState(1);
   const [issues, setIssues] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedIssue, setSelectedIssue] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("facebook/react");
 
@@ -41,6 +44,14 @@ function App() {
         const response = await fetch(url);
         const data = await response.json();
         if (response.status === 200) {
+          const link = response.headers.get("link");
+          if (link) {
+            const getTotalPage = link.match(/page=(\d+)>; rel="last"/);
+            console.log(getTotalPage);
+            if (getTotalPage) {
+              setTotalPageNum(parseInt(getTotalPage[1]));
+            }
+          }
           setIssues(data);
         } else {
           setErrorMsg(data.message);
@@ -56,6 +67,12 @@ function App() {
   const handleSearchInputChange = (event) => {
     setSearchTerm(event.target.value);
   };
+
+  const showDetail = (issue) => {
+    setShowModal(true);
+    setSelectedIssue(issue);
+    console.log(issue.title);
+  };
   return (
     <div className="App">
       <Container>
@@ -67,14 +84,22 @@ function App() {
         />
         {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
 
-        <PaginationIssue />
+        <PaginationIssue
+          pageNum={pageNum}
+          totalPageNum={totalPageNum}
+          setPageNum={setPageNum}
+        />
         {loading ? (
           <ClipLoader color="#f86c6b" size={150} loading={true} />
         ) : (
-          <IssueList issues={issues} />
+          <IssueList issues={issues} showDetail={showDetail} />
         )}
 
-        <IssueModal />
+        <IssueModal
+          selectedIssue={selectedIssue}
+          showModal={showModal}
+          setShowModal={setShowModal}
+        />
       </Container>
     </div>
   );
